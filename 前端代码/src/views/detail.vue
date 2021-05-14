@@ -2,18 +2,18 @@
 <template>
   <div>
       <div class="detail">
-          <div class="detailItem" v-for="(item,index) in 24" @click="toPay(item)">
+          <div class="detailItem" v-for="(item,index) in goods" @click="toPay(item)">
               <div class="pic">
-                  <img src="https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/5dc32ec73299ff79556dcd1cf0f0ac11.png?thumb=1&w=200&h=200" alt="">
+                  <img :src="item.photo" mode="widthFix">
               </div>
               <div class="goodName">
-                  小米MIX FOLD
+                  {{item.name}}
               </div>
               <div class="goodDetail">
-                  折叠大屏 | 自研芯片
+                  {{item.information}}
               </div>
               <div class="goodPrice">
-                  9999元起
+                  {{item.moneyon}}
               </div>
           </div>
       </div>
@@ -25,13 +25,16 @@ export default {
 name:'Detail',
   data () {
     return {
-
+        goods:this.$route.params.goods
     };
   },
   components: {},
   methods:{
       toPay(item){
-          this.$router.replace("pay")
+          this.$router.push({
+              name:"pay",
+              params: {goodsDetail:item}
+          })
       }
   }
 }
@@ -53,6 +56,9 @@ name:'Detail',
 }
 .pic{
     text-align: center;
+}
+.pic img{
+    width: 160px;
 }
 .goodName{
     text-align: center;

@@ -1,43 +1,110 @@
 <!-- 展示目录 -->
 <template>
-  <div class="maindisplay">
+  <div class="maindisplay" @mouseleave="mouseLeave()">
       <div class="category">
           <ul>
-              <li  v-for="(item,index) in types" @mouseenter="mouseover(index,paths[index])" :class="{active: index === currentIndex}" @mouseleave="mouseLeave(paths[index])"><a href="#">{{item}}</a></li>
+              <!-- <a v-for="(item,index) in types" @click="toDetail(displays)"><li @mouseenter="mouseover(index,paths[index])" :class="{active: index === currentIndex}" @mouseleave="mouseLeave(paths[index])">{{item}}</li></a> -->
+              <a v-for="(item,index) in types" @click="toDetail(displays)"><li @mouseenter="mouseover(index,paths[index])" :class="{active: index === currentIndex}">{{item}}</li></a>
           </ul>
       </div>
       <div class="goods">
           <!-- <slot>123456</slot>采用路由的加载方式复用性高 -->
           <!-- 直接选择展示不同的数据 使得代码更加的简单 -->
-          <div class="goodItem" v-for="(item,index) in 24">
-              <a href="detail" @click="toDeatil(item)"><img src="https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/32c652aa0d2da1d043b837eba6098541.png?thumb=1&w=40&h=40" alt="">小米笔记本电脑</a>
+           <swiper :options="swiperOption" ref="mySwiper"  v-if="this.currentIndex===-1">
+            <swiper-slide><img src="https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/808804e4f58a25704f60bdc5b5e75cfd.jpg?w=2452&h=920" alt=""></swiper-slide>
+            <swiper-slide><img src="https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/a5ebb3ecd10ba5b5f1fa25125d034492.jpg?thumb=1&w=1226&h=460" alt=""></swiper-slide>
+            <swiper-slide><img src="https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/808804e4f58a25704f60bdc5b5e75cfd.jpg?w=2452&h=920" alt=""></swiper-slide>
+            <swiper-slide><img src="https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/175b22f0032803f8bdbd94590c8c6629.jpeg?thumb=1&w=1226&h=460" alt=""></swiper-slide>
+            <swiper-slide><img src="https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/808804e4f58a25704f60bdc5b5e75cfd.jpg?w=2452&h=920" alt=""></swiper-slide>
+            <div class="swiper-pagination" slot="pagination"></div>
+            <div class="swiper-button-prev" slot="button-prev"></div>
+            <div class="swiper-button-next" slot="button-next"></div>
+          </swiper>
+          <div class="goodItem" v-for="(item,index) in displays" v-else>
+              <a @click="toPay(item)"><img :src="item.photo" alt="" mode="widthFix">{{item.information?item.information:"小米产品"}}</a>
           </div>
       </div>
   </div>
 </template>
 
 <script>
+import { swiper, swiperSlide } from "vue-awesome-swiper";
+import 'swiper/swiper-bundle.css'
 export default {
 name:'MainDisplay',
   data () {
     return {
-        types:["手机 电话卡","电视 盒子","笔记本 显示器","家电 插线板","出行 穿戴","智能 路由器","电源 配件","健康 儿童","耳朵 音响","生活 箱包"],
-        paths:["phone","TV","computer","household","clothes","routers","electrity","health","audio","bag"],
-        currentIndex:0
+        currentIndex:-1,
+        swiperOption: {
+        loop: true,
+        autoplay: {
+          delay: 3000,
+          stopOnLastSlide: false,
+          disableOnInteraction: false
+        },
+        // 显示分页
+        pagination: {
+          el: ".swiper-pagination",
+          clickable: true //允许分页点击跳转
+        },
+        // 设置点击箭头
+        navigation: {
+          nextEl: ".swiper-button-next",
+          prevEl: ".swiper-button-prev"
+        },
+         pagination: {
+            el: '.swiper-pagination'
+          },
+      }
     };
   },
   methods:{
       mouseover(index,path){
            this.currentIndex = index;
         //   this.$router.replace(path)
+           this.$emit("getDisplays",path);
       },
-      mouseLeave(path){
-
+      mouseLeave(){
+          this.currentIndex = -1;
       },
-      toDeatil(item){
-         // this.$router.replace("detail")
+      //跳转到支付页面
+      toPay(item){
+          this.$router.push(
+          {
+              name:"pay",
+              params: {goodsDetail:item}
+          
+          });
+          
+      },
+      //跳转到大图展示
+      toDetail(item){
+          this.$router.push({
+              name:'detail',
+              params:{goods:item}
+          })
       }
-  }
+  },
+  components:{
+      swiper,
+      swiperSlide
+  },
+   props: {
+      displays: {
+        type: Array,
+        default() {
+          return []
+        }
+      },
+      types:{
+          type:Array,
+          default:[]
+      },
+      paths:{
+          type:Array,
+          default:[]
+      }
+    }
 }
 
 </script>
@@ -77,11 +144,21 @@ name:'MainDisplay',
     justify-content: center;
 }
 .goodItem{
-    text-align: center;
+    color: black;
     width: 240px;
     height: 50px;
 }
+.goodItem img{
+    width: 40px;
+}
 .active{
     background-color: #ff6700;
+}
+a:hover{
+    color: #ff6700;
+}
+.swiper-slide img{
+    height: 460px;
+    width: 100%;
 }
 </style>
